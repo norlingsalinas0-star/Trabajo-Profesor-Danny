@@ -1,0 +1,471 @@
+--html--
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Fuente -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="container">
+
+        <h1>TaskFlow</h1>
+
+        <div class="formulario">
+
+            <input 
+                type="text" 
+                id="titulo"
+                placeholder="Escribe el título de la tarea"
+            >
+
+            <textarea 
+                id="descripcion"
+                placeholder="Escribe una descripción"
+            ></textarea>
+
+            <button id="btnAgregar">
+                Agregar tarea
+            </button>
+
+            <p id="mensajeError"></p>
+
+        </div>
+
+        <div id="listaTareas" class="lista-tareas"></div>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
+
+--css--
+
+/* RESET */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+/* BODY */
+
+body{
+    font-family:'Poppins', sans-serif;
+    background:linear-gradient(135deg,#0f172a,#1e1b4b,#312e81);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+/* CONTENEDOR */
+
+.container{
+    width:100%;
+    max-width:700px;
+    background:#ffffff;
+    padding:35px;
+    border-radius:25px;
+    box-shadow:0 15px 35px rgba(0,0,0,0.4);
+}
+
+/* TITULO */
+
+h1{
+    text-align:center;
+    color:#312e81;
+    margin-bottom:30px;
+    font-size:35px;
+}
+
+/* FORMULARIO */
+
+.formulario{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+/* INPUTS */
+
+input,
+textarea{
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:14px;
+    background:#eef2ff;
+    font-size:15px;
+    outline:none;
+    transition:0.3s;
+}
+
+input:focus,
+textarea:focus{
+    background:#e0e7ff;
+    border:2px solid #6366f1;
+}
+
+/* TEXTAREA */
+
+textarea{
+    resize:none;
+    height:110px;
+}
+
+/* BOTONES */
+
+button{
+    border:none;
+    padding:14px;
+    border-radius:14px;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:500;
+    transition:0.3s;
+}
+
+/* BOTON AGREGAR */
+
+#btnAgregar{
+    background:#4f46e5;
+    color:white;
+}
+
+#btnAgregar:hover{
+    background:#4338ca;
+    transform:scale(1.02);
+}
+
+/* MENSAJE ERROR */
+
+#mensajeError{
+    color:#dc2626;
+    font-size:14px;
+    text-align:center;
+}
+
+/* LISTA */
+
+.lista-tareas{
+    margin-top:30px;
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+}
+
+/* TAREA */
+
+.tarea{
+    background:#f8fafc;
+    padding:22px;
+    border-radius:18px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.08);
+    animation:aparecer 0.4s ease;
+}
+
+@keyframes aparecer{
+
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+
+}
+
+/* TITULO TAREA */
+
+.tarea h3{
+    color:#1e1b4b;
+    margin-bottom:10px;
+}
+
+/* DESCRIPCION */
+
+.tarea p{
+    color:#475569;
+    margin-bottom:20px;
+}
+
+/* BOTONES */
+
+.botones{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+/* EDITAR */
+
+.editar{
+    background:#f59e0b;
+    color:white;
+}
+
+.editar:hover{
+    background:#d97706;
+}
+
+/* ELIMINAR */
+
+.eliminar{
+    background:#ef4444;
+    color:white;
+}
+
+.eliminar:hover{
+    background:#dc2626;
+}
+
+/* GUARDAR */
+
+.guardar{
+    background:#10b981;
+    color:white;
+}
+
+.guardar:hover{
+    background:#059669;
+}
+
+/* CANCELAR */
+
+.cancelar{
+    background:#64748b;
+    color:white;
+}
+
+.cancelar:hover{
+    background:#475569;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:768px){
+
+    .container{
+        padding:25px;
+    }
+
+    .botones{
+        flex-direction:column;
+    }
+
+    button{
+        width:100%;
+    }
+
+}
+
+--java--
+
+const titulo = document.getElementById("titulo");
+const descripcion = document.getElementById("descripcion");
+const btnAgregar = document.getElementById("btnAgregar");
+const listaTareas = document.getElementById("listaTareas");
+const mensajeError = document.getElementById("mensajeError");
+
+/* LOCAL STORAGE */
+
+let tareas = JSON.parse(localStorage.getItem("tareas")) || [];
+
+mostrarTareas();
+
+/* EVENTO */
+
+btnAgregar.addEventListener("click", agregarTarea);
+
+/* AGREGAR TAREA */
+
+function agregarTarea(){
+
+    const tituloValor = titulo.value.trim();
+    const descripcionValor = descripcion.value.trim();
+
+    mensajeError.textContent = "";
+
+    /* VALIDACIONES */
+
+    if(tituloValor === ""){
+        mensajeError.textContent = "El título no puede estar vacío";
+        return;
+    }
+
+    if(tituloValor.length < 3){
+        mensajeError.textContent = "El título debe tener mínimo 3 caracteres";
+        return;
+    }
+
+    if(descripcionValor.length > 120){
+        mensajeError.textContent = "La descripción no puede superar 120 caracteres";
+        return;
+    }
+
+    const existe = tareas.some(
+        tarea => tarea.titulo.toLowerCase() === tituloValor.toLowerCase()
+    );
+
+    if(existe){
+        mensajeError.textContent = "La tarea ya existe";
+        return;
+    }
+
+    const tarea = {
+        id: Date.now(),
+        titulo: tituloValor,
+        descripcion: descripcionValor
+    };
+
+    tareas.push(tarea);
+
+    guardarTareas();
+
+    mostrarTareas();
+
+    titulo.value = "";
+    descripcion.value = "";
+}
+
+/* MOSTRAR TAREAS */
+
+function mostrarTareas(){
+
+    listaTareas.innerHTML = "";
+
+    tareas.forEach(tarea => {
+
+        const div = document.createElement("div");
+
+        div.classList.add("tarea");
+
+        div.innerHTML = `
+        
+            <h3>${tarea.titulo}</h3>
+
+            <p>${tarea.descripcion}</p>
+
+            <div class="botones">
+
+                <button class="editar">
+                    Editar
+                </button>
+
+                <button class="eliminar">
+                    Eliminar
+                </button>
+
+            </div>
+        `;
+
+        /* ELIMINAR */
+
+        const btnEliminar = div.querySelector(".eliminar");
+
+        btnEliminar.addEventListener("click", () => {
+
+            tareas = tareas.filter(
+                t => t.id !== tarea.id
+            );
+
+            guardarTareas();
+
+            mostrarTareas();
+        });
+
+        /* EDITAR */
+
+        const btnEditar = div.querySelector(".editar");
+
+        btnEditar.addEventListener("click", () => {
+
+            div.innerHTML = `
+            
+                <input 
+                    type="text"
+                    class="inputEditarTitulo"
+                    value="${tarea.titulo}"
+                >
+
+                <textarea 
+                    class="inputEditarDescripcion"
+                >${tarea.descripcion}</textarea>
+
+                <div class="botones">
+
+                    <button class="guardar">
+                        Guardar
+                    </button>
+
+                    <button class="cancelar">
+                        Cancelar
+                    </button>
+
+                </div>
+            `;
+
+            /* GUARDAR */
+
+            const btnGuardar = div.querySelector(".guardar");
+
+            btnGuardar.addEventListener("click", () => {
+
+                const nuevoTitulo = div.querySelector(".inputEditarTitulo").value.trim();
+
+                const nuevaDescripcion = div.querySelector(".inputEditarDescripcion").value.trim();
+
+                if(nuevoTitulo === ""){
+                    alert("El título no puede estar vacío");
+                    return;
+                }
+
+                tarea.titulo = nuevoTitulo;
+                tarea.descripcion = nuevaDescripcion;
+
+                guardarTareas();
+
+                mostrarTareas();
+            });
+
+            /* CANCELAR */
+
+            const btnCancelar = div.querySelector(".cancelar");
+
+            btnCancelar.addEventListener("click", () => {
+                mostrarTareas();
+            });
+
+        });
+
+        listaTareas.appendChild(div);
+
+    });
+
+}
+
+/* GUARDAR */
+
+function guardarTareas(){
+
+    localStorage.setItem(
+        "tareas",
+        JSON.stringify(tareas)
+    );
+
+}
