@@ -1,0 +1,176 @@
+--java--
+
+const titulo = document.getElementById("titulo");
+const descripcion = document.getElementById("descripcion");
+const btnAgregar = document.getElementById("btnAgregar");
+const listaTareas = document.getElementById("listaTareas");
+
+btnAgregar.addEventListener("click", agregarTarea);
+
+let tareas = [];
+
+function agregarTarea(){
+
+    const tituloValor = titulo.value.trim();
+    const descripcionValor = descripcion.value.trim();
+
+    // VALIDACIONES
+
+    if(tituloValor === ""){
+        alert("El título no puede estar vacío");
+        return;
+    }
+
+    if(tituloValor.length < 3){
+        alert("El título debe tener mínimo 3 caracteres");
+        return;
+    }
+
+    if(descripcionValor.length > 100){
+        alert("La descripción no puede superar 100 caracteres");
+        return;
+    }
+
+    const existe = tareas.some(
+        tarea => tarea.titulo.toLowerCase() === tituloValor.toLowerCase()
+    );
+
+    if(existe){
+        alert("La tarea ya existe");
+        return;
+    }
+
+    const tareaObjeto = {
+        id: Date.now(),
+        titulo: tituloValor,
+        descripcion: descripcionValor
+    };
+
+    tareas.push(tareaObjeto);
+
+    mostrarTareas();
+
+    titulo.value = "";
+    descripcion.value = "";
+}
+
+function mostrarTareas(){
+
+    listaTareas.innerHTML = "";
+
+    tareas.forEach(tarea => {
+
+        const div = document.createElement("div");
+
+        div.classList.add("tarea");
+
+        div.innerHTML = `
+        
+            <h3>${tarea.titulo}</h3>
+
+            <p>${tarea.descripcion}</p>
+
+            <button class="editar">
+                Editar
+            </button>
+
+            <button class="eliminar">
+                Eliminar
+            </button>
+        `;
+
+        // ELIMINAR
+
+        const btnEliminar = div.querySelector(".eliminar");
+
+        btnEliminar.addEventListener("click", () => {
+
+            tareas = tareas.filter(
+                t => t.id !== tarea.id
+            );
+
+            mostrarTareas();
+        });
+
+        // EDITAR
+
+        const btnEditar = div.querySelector(".editar");
+
+        btnEditar.addEventListener("click", () => {
+
+            div.innerHTML = `
+            
+                <input 
+                    type="text" 
+                    class="inputEditarTitulo"
+                    value="${tarea.titulo}"
+                >
+
+                <textarea 
+                    class="inputEditarDescripcion"
+                >${tarea.descripcion}</textarea>
+
+                <button class="guardar">
+                    Guardar
+                </button>
+
+                <button class="cancelar">
+                    Cancelar
+                </button>
+            `;
+
+            // GUARDAR
+
+            const btnGuardar = div.querySelector(".guardar");
+
+            btnGuardar.addEventListener("click", () => {
+
+                const nuevoTitulo = div.querySelector(".inputEditarTitulo").value.trim();
+
+                const nuevaDescripcion = div.querySelector(".inputEditarDescripcion").value.trim();
+
+                if(nuevoTitulo === ""){
+                    alert("El título no puede estar vacío");
+                    return;
+                }
+
+                tarea.titulo = nuevoTitulo;
+                tarea.descripcion = nuevaDescripcion;
+
+                mostrarTareas();
+            });
+
+            // CANCELAR
+
+            const btnCancelar = div.querySelector(".cancelar");
+
+            btnCancelar.addEventListener("click", () => {
+                mostrarTareas();
+            });
+
+        });
+
+        listaTareas.appendChild(div);
+
+    });
+
+}
+
+--css estilo--
+
+.editar{
+    background:#f59e0b;
+    margin-top:15px;
+    margin-right:10px;
+}
+
+.guardar{
+    background:#10b981;
+    margin-top:10px;
+    margin-right:10px;
+}
+
+.cancelar{
+    background:#64748b;
+    margin-top:10px;
+}
