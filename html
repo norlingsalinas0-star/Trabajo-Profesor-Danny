@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrador de Tareas</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+
+        <h1>Administrador de Tareas</h1>
+
+        <div class="formulario">
+
+            <input 
+                type="text" 
+                id="titulo" 
+                placeholder="Título de la tarea"
+            >
+
+            <textarea 
+                id="descripcion"
+                placeholder="Descripción"
+            ></textarea>
+
+            <button id="btnAgregar">
+                Agregar Tarea
+            </button>
+
+        </div>
+
+        <div id="listaTareas"></div>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
+
+--Final--
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Fuente -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="container">
+
+        <h1>TaskFlow</h1>
+
+        <div class="formulario">
+
+            <input 
+                type="text" 
+                id="titulo"
+                placeholder="Escribe el título de la tarea"
+            >
+
+            <textarea 
+                id="descripcion"
+                placeholder="Escribe una descripción"
+            ></textarea>
+
+            <button id="btnAgregar">
+                Agregar tarea
+            </button>
+
+            <p id="mensajeError"></p>
+
+        </div>
+
+        <div id="listaTareas" class="lista-tareas"></div>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
